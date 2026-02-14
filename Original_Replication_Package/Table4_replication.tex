@@ -1,0 +1,29 @@
+{
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\begin{tabular}{l*{3}{c}}
+\hline\hline
+            &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}\\
+            &\multicolumn{1}{c}{delinq\_mort}&\multicolumn{1}{c}{delinq\_mort}&\multicolumn{1}{c}{delinq\_mort}\\
+\hline
+Max Benefit &       -0.03         &        0.01         &        0.00         \\
+            &      (0.11)         &      (0.11)         &         (.)         \\
+Max Benefit $\times$ Layoff&                     &       -0.22\sym{**} &       -0.23\sym{**} \\
+            &                     &      (0.08)         &      (0.08)         \\
+Layoff      &        6.49\sym{***}&        6.44\sym{***}&        6.43\sym{***}\\
+            &      (0.35)         &      (0.32)         &      (0.33)         \\
+\hline
+Observations&       64919         &       64919         &       64919         \\
+^2$         &        0.04         &        0.04         &        0.05         \\
+Household controls&         Yes         &         Yes         &         Yes         \\
+State-year controls&         Yes         &         Yes         &           —         \\
+State and year fixed effects&         Yes         &         Yes         &           —         \\
+State-year fixed effects&          No         &          No         &         Yes         \\
+\hline\hline
+\multicolumn{4}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{4}{l}{\footnotesize Notes: Linear probability models. Dependent variable is mortgage delinquency (indicator $\times$ 100).}\\
+\multicolumn{4}{l}{\footnotesize Max Benefit is measured in \$1,000. Standard errors clustered at the state level.}\\
+\multicolumn{4}{l}{\footnotesize Home price growth (Case-Shiller/CoreLogic) is proprietary and excluded from the public replication data.}\\
+\multicolumn{4}{l}{\footnotesize In column (3), state-by-year fixed effects absorb the Max Benefit main effect.}\\
+\multicolumn{4}{l}{\footnotesize \sym{*} \(p<0.05\), \sym{**} \(p<0.01\), \sym{***} \(p<0.001\)}\\
+\end{tabular}
+}

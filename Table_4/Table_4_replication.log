@@ -1,0 +1,443 @@
+--------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/miranaaazzz/desktop/Replication_UI a
+> s a Housing Market Stabilizer/Table_4/Table_4_replicat
+> ion.log
+  log type:  text
+ opened on:  13 Feb 2026, 17:37:38
+
+. 
+. * State-level macro and labor market controls
+. * (home price growth excluded due to data restrictions
+> )
+. global state_controls "unemp_rate ln_realgdp_percap wa
+> ges_state ui_rr neg_ui_rr union_cov"
+
+. 
+. * Household-level controls
+. * Includes earnings, wealth, education, and mortgage r
+> isk,
+. * with loan-to-value ratio and negative equity interac
+> ted
+. * with layoff status
+. global ind_controls ///
+>         "i.layoff##c.ltv_win_demean i.layoff##c.neg_eq
+> uity_demean earnings_total thhtnw educ_hs educ_somecol
+>  educ_col educ_grad"
+
+. 
+.         
+.         
+. *** Table 4: Mortgage Delinquency Regressions
+. eststo clear
+
+. 
+. * (1) State FE, no interaction
+. areg delinq_mort max_ben_demean i.layoff year_dum* $st
+> ate_controls $ind_controls ///
+>     [pw = weight_ref], a(stcode) cl(stcode)
+(sum of wgt is 267,820,618.56215)
+note: year_dum6 omitted because of collinearity.
+
+Linear regression, absorbing indicators            Numbe
+> r of obs                                              
+>              =  64,919
+Absorbed variable: stcode                          No. o
+> f categories                                          
+>              =      51
+                                                   F(23,
+>  50)                                                  
+>              =  123.13
+                                                   Prob 
+> > F                                                   
+>              =  0.0000
+                                                   R-squ
+> ared                                                  
+>              =  0.0438
+                                                   Adj R
+> -squared                                              
+>              =  0.0427
+                                                   Root 
+> MSE                                                   
+>              = 22.0519
+
+                                (Std. err. adjusted for 
+> 51 clusters in stcode)
+--------------------------------------------------------
+> ----------------------
+             |               Robust
+ delinq_mort | Coefficient  std. err.      t    P>|t|   
+>   [95% con                                            
+>           f. interval]
+-------------+------------------------------------------
+> ----------------------
+max_ben_de~n |  -.0330708   .1093289    -0.30   0.764   
+>  -.2526643                                            
+>               .1865228
+    1.layoff |    6.49383   .3450122    18.82   0.000   
+>   5.800853                                            
+>               7.186808
+   year_dum1 |   2.064967   2.938903     0.70   0.486   
+>  -3.837992                                            
+>               7.967927
+   year_dum2 |     .60027   2.725189     0.22   0.827   
+>  -4.873433                                            
+>               6.073973
+   year_dum3 |   1.080938   2.003897     0.54   0.592   
+>  -2.944008                                            
+>               5.105885
+   year_dum4 |  -.4143491   1.114655    -0.37   0.712   
+>  -2.653199                                            
+>                 1.8245
+   year_dum5 |  -.0962773   .9102056    -0.11   0.916   
+>  -1.924479                                            
+>               1.731924
+   year_dum6 |          0  (omitted)
+  unemp_rate |   .3706238   .1520547     2.44   0.018   
+>   .0652129                                            
+>               .6760347
+ln_realgdp~p |  -3.287127    4.04065    -0.81   0.420   
+>  -11.40301                                            
+>               4.828756
+ wages_state |   .1225448   .0744339     1.65   0.106   
+>  -.0269601                                            
+>               .2720498
+       ui_rr |  -.1188816   .2118653    -0.56   0.577   
+>  -.5444256                                            
+>               .3066623
+   neg_ui_rr |  -.5726519   .3241384    -1.77   0.083   
+>  -1.223703                                            
+>               .0783992
+   union_cov |  -.2239618   .1273477    -1.76   0.085   
+>  -.4797472                                            
+>               .0318237
+ltv_win_de~n |   4.127385   .3376522    12.22   0.000   
+>   3.449191                                            
+>               4.805579
+             |
+      layoff#|
+          c. |
+ltv_win_de~n |
+          1  |   6.880785   1.274409     5.40   0.000   
+>    4.32106                                            
+>                9.44051
+             |
+neg_equity~n |   2.482117   .7264015     3.42   0.001   
+>   1.023096                                            
+>               3.941137
+             |
+      layoff#|
+          c. |
+neg_equity~n |
+          1  |   2.553762   1.645762     1.55   0.127   
+>  -.7518487                                            
+>               5.859373
+             |
+earnings_t~l |   -.026617   .0018546   -14.35   0.000   
+>  -.0303422                                            
+>              -.0228919
+      thhtnw |  -.1610212   .0683342    -2.36   0.022   
+>  -.2982745                                            
+>              -.0237678
+     educ_hs |  -1.771843   .9740215    -1.82   0.075   
+>  -3.728222                                            
+>               .1845371
+educ_somecol |  -1.744855   .9307785    -1.87   0.067   
+>  -3.614378                                            
+>               .1246687
+    educ_col |  -4.859943    .970117    -5.01   0.000   
+>   -6.80848                                            
+>              -2.911405
+   educ_grad |  -5.486407   .9465678    -5.80   0.000   
+>  -7.387645                                            
+>               -3.58517
+       _cons |   38.93207   42.62915     0.91   0.365   
+>  -46.69109                                            
+>               124.5552
+--------------------------------------------------------
+> ----------------------
+
+. eststo c1
+
+. 
+. * (2) State FE, interaction: layoff × max_ben
+. areg delinq_mort i.layoff##c.max_ben_demean year_dum* 
+> $state_controls $ind_controls ///
+>     [pw = weight_ref], a(stcode) cl(stcode)
+(sum of wgt is 267,820,618.56215)
+note: year_dum6 omitted because of collinearity.
+
+Linear regression, absorbing indicators            Numbe
+> r of obs                                              
+>              =  64,919
+Absorbed variable: stcode                          No. o
+> f categories                                          
+>              =      51
+                                                   F(24,
+>  50)                                                  
+>              =  121.82
+                                                   Prob 
+> > F                                                   
+>              =  0.0000
+                                                   R-squ
+> ared                                                  
+>              =  0.0439
+                                                   Adj R
+> -squared                                              
+>              =  0.0428
+                                                   Root 
+> MSE                                                   
+>              = 22.0505
+
+                                (Std. err. adjusted for 
+> 51 clusters in stcode)
+--------------------------------------------------------
+> ----------------------
+             |               Robust
+ delinq_mort | Coefficient  std. err.      t    P>|t|   
+>   [95% con                                            
+>           f. interval]
+-------------+------------------------------------------
+> ----------------------
+    1.layoff |   6.441453   .3232506    19.93   0.000   
+>   5.792185                                            
+>               7.090721
+max_ben_de~n |   .0121867   .1085445     0.11   0.911   
+>  -.2058313                                            
+>               .2302047
+             |
+      layoff#|
+          c. |
+max_ben_de~n |
+          1  |  -.2216866    .081294    -2.73   0.009   
+>  -.3849705                                            
+>              -.0584027
+             |
+   year_dum1 |   2.114686   2.952413     0.72   0.477   
+>   -3.81541                                            
+>               8.044782
+   year_dum2 |   .6582848    2.73582     0.24   0.811   
+>  -4.836771                                            
+>                6.15334
+   year_dum3 |   1.142816   2.017498     0.57   0.574   
+>  -2.909449                                            
+>                5.19508
+   year_dum4 |   -.398977   1.118145    -0.36   0.723   
+>  -2.644837                                            
+>               1.846883
+   year_dum5 |  -.0885828   .9130219    -0.10   0.923   
+>  -1.922441                                            
+>               1.745276
+   year_dum6 |          0  (omitted)
+  unemp_rate |   .3706543   .1517076     2.44   0.018   
+>   .0659406                                            
+>                .675368
+ln_realgdp~p |  -3.339473   4.045072    -0.83   0.413   
+>  -11.46424                                            
+>               4.785293
+ wages_state |   .1250381   .0751826     1.66   0.103   
+>  -.0259707                                            
+>               .2760468
+       ui_rr |  -.1158877   .2114632    -0.55   0.586   
+>   -.540624                                            
+>               .3088487
+   neg_ui_rr |   -.576566   .3258343    -1.77   0.083   
+>  -1.231024                                            
+>               .0778915
+   union_cov |   -.221788   .1274058    -1.74   0.088   
+>  -.4776901                                            
+>                .034114
+ltv_win_de~n |   4.153036   .3385563    12.27   0.000   
+>   3.473025                                            
+>               4.833046
+             |
+      layoff#|
+          c. |
+ltv_win_de~n |
+          1  |   6.801387   1.261597     5.39   0.000   
+>   4.267395                                            
+>               9.335378
+             |
+neg_equity~n |    2.42867   .7177392     3.38   0.001   
+>   .9870481                                            
+>               3.870291
+             |
+      layoff#|
+          c. |
+neg_equity~n |
+          1  |   2.875569    1.63826     1.76   0.085   
+>   -.414973                                            
+>                6.16611
+             |
+earnings_t~l |  -.0266451   .0018511   -14.39   0.000   
+>  -.0303632                                            
+>               -.022927
+      thhtnw |   -.162555   .0686233    -2.37   0.022   
+>  -.3003889                                            
+>              -.0247212
+     educ_hs |  -1.757582   .9780926    -1.80   0.078   
+>  -3.722139                                            
+>               .2069743
+educ_somecol |  -1.721689   .9348129    -1.84   0.071   
+>  -3.599316                                            
+>               .1559384
+    educ_col |  -4.843096   .9728929    -4.98   0.000   
+>  -6.797209                                            
+>              -2.888984
+   educ_grad |  -5.466906    .949714    -5.76   0.000   
+>  -7.374462                                            
+>              -3.559349
+       _cons |   39.31199    42.6521     0.92   0.361   
+>  -46.35728                                            
+>               124.9813
+--------------------------------------------------------
+> ----------------------
+
+. eststo c2
+
+. 
+. * (3) State-year FE (absorbing st_year), interaction i
+> dentified within state-year
+. areg delinq_mort i.layoff##c.max_ben_demean year_dum* 
+> $state_controls $ind_controls ///
+>     [pw = weight_ref], a(st_year) cl(stcode)
+(sum of wgt is 267,820,619)
+note: year_dum6 omitted because of collinearity.
+note: wages_state omitted because of collinearity with
+      the absorbed variable.
+note: ln_realgdp_percap omitted because of
+      collinearity with the absorbed variable.
+note: union_cov omitted because of collinearity with
+      the absorbed variable.
+note: unemp_rate omitted because of collinearity with
+      the absorbed variable.
+note: max_ben_demean omitted because of collinearity
+      with the absorbed variable.
+note: ui_rr omitted because of collinearity with the
+      absorbed variable.
+note: year_dum3 omitted because of collinearity with
+      the absorbed variable.
+note: year_dum5 omitted because of collinearity with
+      the absorbed variable.
+note: year_dum4 omitted because of collinearity with
+      the absorbed variable.
+note: year_dum1 omitted because of collinearity with
+      the absorbed variable.
+note: year_dum2 omitted because of collinearity with
+      the absorbed variable.
+note: neg_ui_rr omitted because of collinearity with
+      the absorbed variable.
+
+Linear regression, absorbing indicators            Numbe
+> r of obs                                              
+>              =  64,919
+Absorbed variable: st_year                         No. o
+> f categories                                          
+>              =     278
+                                                   F(12,
+>  50)                                                  
+>              =   95.31
+                                                   Prob 
+> > F                                                   
+>              =  0.0000
+                                                   R-squ
+> ared                                                  
+>              =  0.0481
+                                                   Adj R
+> -squared                                              
+>              =  0.0439
+                                                   Root 
+> MSE                                                   
+>              = 22.0381
+
+                                (Std. err. adjusted for 
+> 51 clusters in stcode)
+--------------------------------------------------------
+> ----------------------
+             |               Robust
+ delinq_mort | Coefficient  std. err.      t    P>|t|   
+>   [95% con                                            
+>           f. interval]
+-------------+------------------------------------------
+> ----------------------
+    1.layoff |   6.431258    .325159    19.78   0.000   
+>   5.778157                                            
+>               7.084359
+max_ben_de~n |          0  (omitted)
+             |
+      layoff#|
+          c. |
+max_ben_de~n |
+          1  |  -.2340343   .0840696    -2.78   0.008   
+>   -.402893                                            
+>              -.0651756
+             |
+   year_dum1 |          0  (omitted)
+   year_dum2 |          0  (omitted)
+   year_dum3 |          0  (omitted)
+   year_dum4 |          0  (omitted)
+   year_dum5 |          0  (omitted)
+   year_dum6 |          0  (omitted)
+  unemp_rate |          0  (omitted)
+ln_realgdp~p |          0  (omitted)
+ wages_state |          0  (omitted)
+       ui_rr |          0  (omitted)
+   neg_ui_rr |          0  (omitted)
+   union_cov |          0  (omitted)
+ltv_win_de~n |   4.056775   .3442635    11.78   0.000   
+>   3.365302                                            
+>               4.748249
+             |
+      layoff#|
+          c. |
+ltv_win_de~n |
+          1  |   6.758686   1.272644     5.31   0.000   
+>   4.202504                                            
+>               9.314868
+             |
+neg_equity~n |   2.383972   .7266155     3.28   0.002   
+>   .9245222                                            
+>               3.843422
+             |
+      layoff#|
+          c. |
+neg_equity~n |
+          1  |    2.95322   1.649588     1.79   0.079   
+>  -.3600761                                            
+>               6.266515
+             |
+earnings_t~l |  -.0264685   .0018774   -14.10   0.000   
+>  -.0302394                                            
+>              -.0226975
+      thhtnw |  -.1595721   .0714191    -2.23   0.030   
+>  -.3030215                                            
+>              -.0161227
+     educ_hs |  -1.704901   .9744073    -1.75   0.086   
+>  -3.662055                                            
+>                .252254
+educ_somecol |  -1.678429   .9340789    -1.80   0.078   
+>  -3.554581                                            
+>               .1977241
+    educ_col |  -4.807003   .9801323    -4.90   0.000   
+>  -6.775657                                            
+>              -2.838349
+   educ_grad |  -5.424603   .9525427    -5.69   0.000   
+>  -7.337842                                            
+>              -3.511365
+       _cons |   8.859024   .9286736     9.54   0.000   
+>   6.993728                                            
+>               10.72432
+--------------------------------------------------------
+> ----------------------
+
+. eststo c3
+
+. 
+. log close
+      name:  <unnamed>
+       log:  /Users/miranaaazzz/desktop/Replication_UI a
+> s a Housing Market Stabilizer/Table_4/Table_4_replicat
+> ion.log
+  log type:  text
+ closed on:  13 Feb 2026, 17:37:39
+--------------------------------------------------------

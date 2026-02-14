@@ -1,0 +1,1087 @@
+--------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/miranaaazzz/Desktop/Replication_UI a
+> s a Housing Market Stabilizer/replication_log.log
+  log type:  text
+ opened on:  13 Feb 2026, 17:37:26
+
+. 
+. * Figure 1
+. do "Figure_1/Figure_1_Replication.do"
+
+. ******************************************************
+> *
+. * UI as a Housing Market Stabilizer (Hsu, Matsa, Melze
+> r)
+. * Replicate Figure 1 (quartiles) + two additional maps
+. *   (A) Increase in max UIB between 1991 and 2010 (by 
+> quartile)
+. *   (B) Levels of max UIB in 1991 (by quartile)
+. *   (C) Levels of max UIB in 2010 (by quartile)
+. *
+. * Outputs (PNG/PDF):
+. *   Figures/Figure1_increase_q4_with_AKHI.png/pdf
+. *   Figures/Figure1_increase_q4_no_AKHI.png/pdf
+. *   Figures/Figure_add_level1991_q4_with_AKHI.png/pdf
+. *   Figures/Figure_add_level1991_q4_no_AKHI.png/pdf
+. *   Figures/Figure_add_level2010_q4_with_AKHI.png/pdf
+. *   Figures/Figure_add_level2010_q4_no_AKHI.png/pdf
+. *
+. * Notes:
+. *   - Figure 1 does NOT require hpi_growth.
+. *   - We merge by state FIPS: stcode -> STATEFP (2-dig
+> it string).
+. *   - Quartiles are computed across ALL 51 states (inc
+> l. AK/HI).
+. ******************************************************
+> *
+. 
+. version 16.0
+
+. clear all
+
+. set more off
+
+. set scheme s2color
+
+. 
+. cd "/Users/miranaaazzz/Desktop/Replication_UI as a Hou
+> sing Market Stabilizer"
+/Users/miranaaazzz/Desktop/Replication_UI as a Housing M
+> arket Stabilizer
+
+. 
+. capture mkdir "Figures"
+
+. capture mkdir "shapefiles_dta"
+
+. 
+. cap which shp2dta
+
+. if _rc ssc install shp2dta, replace
+
+. 
+. cap which spmap
+
+. if _rc ssc install spmap, replace
+
+. 
+. 
+. * Shapefile -> Stata map files (safe to re-run)
+. shp2dta using "shapefiles/cb_2018_us_state_20m.shp", /
+> //
+>     database("shapefiles_dta/us_state_db") ///
+>     coordinates("shapefiles_dta/us_state_coor") ///
+>     genid(id) replace
+type: 5
+
+. 
+. * Build state-level series: max_ben1991, max_ben2010, 
+> increase
+. use "ui_econ_analysis.dta", clear
+
+. keep if inlist(year, 1991, 2010)
+(918 observations deleted)
+
+. keep stcode year max_ben
+
+. reshape wide max_ben, i(stcode) j(year)
+(j = 1991 2010)
+
+Data                               Long   ->   Wide
+--------------------------------------------------------
+> ---------------------
+Number of observations              102   ->   51       
+>    
+Number of variables                   3   ->   3        
+>    
+j variable (2 values)              year   ->   (dropped)
+xij variables:
+                                max_ben   ->   max_ben19
+> 91 max_ben2010
+--------------------------------------------------------
+> ---------------------
+
+. 
+. rename max_ben1991 max_ben_1991
+
+. rename max_ben2010 max_ben_2010
+
+. 
+. gen d_max_ben = max_ben_2010 - max_ben_1991
+
+. 
+. label var max_ben_1991 "Maximum UI benefit level (1991
+> )"
+
+. label var max_ben_2010 "Maximum UI benefit level (2010
+> )"
+
+. label var d_max_ben    "Change in max UI benefit (2010
+> -1991)"
+
+. 
+. * Merge key
+. gen STATEFP = string(stcode, "%02.0f")
+
+. 
+. 
+. * Merge with shapefile database (for id + names)
+. merge 1:1 STATEFP using "shapefiles_dta/us_state_db.dt
+> a"
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             1
+        from master                         0  (_merge==
+> 1)
+        from using                          1  (_merge==
+> 2)
+
+    Matched                                51  (_merge==
+> 3)
+    -----------------------------------------
+
+. keep if _merge==3
+(1 observation deleted)
+
+. drop _merge
+
+. 
+. count
+  51
+
+. assert r(N)==51
+
+. 
+. 
+. * Create quartiles (4 groups) for: increase, 1991 leve
+> l, 2010 level
+. * Use xtile (standard quartiles); labels 1..4
+. xtile q_inc = d_max_ben, nq(4)
+
+. xtile q_91  = max_ben_1991, nq(4)
+
+. xtile q_10  = max_ben_2010, nq(4)
+
+. 
+. label define q4lbl 1 "1" 2 "2" 3 "3" 4 "4", replace
+
+. label values q_inc q4lbl
+
+. label values q_91  q4lbl
+
+. label values q_10  q4lbl
+
+. 
+. label var q_inc "Quartile group (1=lowest, 4=highest):
+>  increase"
+
+. label var q_91  "Quartile group (1=lowest, 4=highest):
+>  level 1991"
+
+. label var q_10  "Quartile group (1=lowest, 4=highest):
+>  level 2010"
+
+. 
+. * Sanity checks
+. tab q_inc, missing
+
+   Quartile |
+      group |
+ (1=lowest, |
+4=highest): |
+   increase |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          1 |         13       25.49       25.49
+          2 |         13       25.49       50.98
+          3 |         13       25.49       76.47
+          4 |         12       23.53      100.00
+------------+-----------------------------------
+      Total |         51      100.00
+
+. tab q_91,  missing
+
+   Quartile |
+      group |
+ (1=lowest, |
+4=highest): |
+ level 1991 |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          1 |         13       25.49       25.49
+          2 |         13       25.49       50.98
+          3 |         13       25.49       76.47
+          4 |         12       23.53      100.00
+------------+-----------------------------------
+      Total |         51      100.00
+
+. tab q_10,  missing
+
+   Quartile |
+      group |
+ (1=lowest, |
+4=highest): |
+ level 2010 |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          1 |         13       25.49       25.49
+          2 |         13       25.49       50.98
+          3 |         13       25.49       76.47
+          4 |         12       23.53      100.00
+------------+-----------------------------------
+      Total |         51      100.00
+
+. 
+. 
+. * Map style: grayscale quartiles (paper-like)
+. * 1 -> lightest, 4 -> darkest
+. local q4colors "gs15 gs11 gs7 gs3"
+
+. 
+. 
+. * A) Figure 1: INCREASE quartiles
+. 
+. * WITH AK/HI
+. spmap q_inc using "shapefiles_dta/us_state_coor.dta", 
+> ///
+>     id(id) ///
+>     clmethod(custom) clbreaks(0.5 1.5 2.5 3.5 4.5) ///
+>     fcolor(`q4colors') ///
+>     ocolor(black) osize(vthin) ///
+>     legend( ///
+>         pos(4) ring(0) ///
+>         region(lstyle(solid) lcolor(black) fcolor(whit
+> e)) ///
+>         symxsize(*2.6) symysize(*2.6) ///
+>         size(*1.2) ///
+>         order(1 2 3 4) ///
+>         label(1 "1") label(2 "2") label(3 "3") label(4
+>  "4") ///
+>     ) ///
+>     title("") ///
+>     note("Figure 1. Geographic distribution of regular
+>  state unemployment insurance benefit increases betwee
+> n 1991 and 2010, by quartile.", ///
+>          size(vsmall)) ///
+>     graphregion(color(white) margin(2 2 2 2)) ///
+>     plotregion(margin(2 2 2 2))
+
+. 
+. graph export "Figure_1/Figures/Figure1_increase_q4_wit
+> h_AKHI.png", replace width(5000)
+file /Users/miranaaazzz/Desktop/Replication_UI as a
+    Housing Market
+    Stabilizer/Figure_1/Figures/Figure1_increase_q4_wi
+    > th_AKHI.png saved as PNG format
+
+. graph export "Figure_1/Figures/Figure1_increase_q4_wit
+> h_AKHI.pdf", replace
+file /Users/miranaaazzz/Desktop/Replication_UI as a
+    Housing Market
+    Stabilizer/Figure_1/Figures/Figure1_increase_q4_wi
+    > th_AKHI.pdf saved as PDF format
+
+. 
+. * NO AK/HI (exclude only at plotting stage)
+. spmap q_inc if !inlist(STATEFP,"02","15") using "shape
+> files_dta/us_state_coor.dta", ///
+>     id(id) ///
+>     clmethod(custom) clbreaks(0.5 1.5 2.5 3.5 4.5) ///
+>     fcolor(`q4colors') ///
+>     ocolor(black) osize(vthin) ///
+>     legend( ///
+>         pos(4) ring(0) ///
+>         region(lstyle(solid) lcolor(black) fcolor(whit
+> e)) ///
+>         symxsize(*2.6) symysize(*2.6) ///
+>         size(*1.2) ///
+>         order(1 2 3 4) ///
+>         label(1 "1") label(2 "2") label(3 "3") label(4
+>  "4") ///
+>     ) ///
+>     title("") ///
+>     note("Figure 1. Geographic distribution of regular
+>  state unemployment insurance benefit increases betwee
+> n 1991 and 2010, by quartile.", ///
+>          size(vsmall)) ///
+>     graphregion(color(white) margin(2 2 2 2)) ///
+>     plotregion(margin(2 2 2 2))
+
+. 
+. graph export "Figure_1/Figures/Figure1_increase_q4_no_
+> AKHI.png", replace width(5000)
+file /Users/miranaaazzz/Desktop/Replication_UI as a
+    Housing Market
+    Stabilizer/Figure_1/Figures/Figure1_increase_q4_no
+    > _AKHI.png saved as PNG format
+
+. graph export "Figure_1/Figures/Figure1_increase_q4_no_
+> AKHI.pdf", replace
+file /Users/miranaaazzz/Desktop/Replication_UI as a
+    Housing Market
+    Stabilizer/Figure_1/Figures/Figure1_increase_q4_no
+    > _AKHI.pdf saved as PDF format
+
+. 
+. 
+. 
+. * B) Additional Figure: LEVELS in 1991 (quartiles)
+. 
+. * WITH AK/HI
+. spmap q_91 using "shapefiles_dta/us_state_coor.dta", /
+> //
+>     id(id) ///
+>     clmethod(custom) clbreaks(0.5 1.5 2.5 3.5 4.5) ///
+>     fcolor(`q4colors') ///
+>     ocolor(black) osize(vthin) ///
+>     legend( ///
+>         pos(4) ring(0) ///
+>         region(lstyle(solid) lcolor(black) fcolor(whit
+> e)) ///
+>         symxsize(*2.6) symysize(*2.6) ///
+>         size(*1.2) ///
+>         order(1 2 3 4) ///
+>         label(1 "1") label(2 "2") label(3 "3") label(4
+>  "4") ///
+>     ) ///
+>     title("") ///
+>     note("Additional Figure. Geographic distribution o
+> f regular state unemployment insurance benefit levels 
+> in 1991, by quartile.", ///
+>          size(vsmall)) ///
+>     graphregion(color(white) margin(2 2 2 2)) ///
+>     plotregion(margin(2 2 2 2))
+
+. 
+. graph export "Figure_1/Figures/Figure_add_level1991_q4
+> _with_AKHI.png", replace width(5000)
+file /Users/miranaaazzz/Desktop/Replication_UI as a
+    Housing Market
+    Stabilizer/Figure_1/Figures/Figure_add_level1991_q
+    > 4_with_AKHI.png saved as PNG format
+
+. graph export "Figure_1/Figures/Figure_add_level1991_q4
+> _with_AKHI.pdf", replace
+file /Users/miranaaazzz/Desktop/Replication_UI as a
+    Housing Market
+    Stabilizer/Figure_1/Figures/Figure_add_level1991_q
+    > 4_with_AKHI.pdf saved as PDF format
+
+. 
+. * NO AK/HI
+. spmap q_91 if !inlist(STATEFP,"02","15") using "shapef
+> iles_dta/us_state_coor.dta", ///
+>     id(id) ///
+>     clmethod(custom) clbreaks(0.5 1.5 2.5 3.5 4.5) ///
+>     fcolor(`q4colors') ///
+>     ocolor(black) osize(vthin) ///
+>     legend( ///
+>         pos(4) ring(0) ///
+>         region(lstyle(solid) lcolor(black) fcolor(whit
+> e)) ///
+>         symxsize(*2.6) symysize(*2.6) ///
+>         size(*1.2) ///
+>         order(1 2 3 4) ///
+>         label(1 "1") label(2 "2") label(3 "3") label(4
+>  "4") ///
+>     ) ///
+>     title("") ///
+>     note("Additional Figure. Geographic distribution o
+> f regular state unemployment insurance benefit levels 
+> in 1991, by quartile.", ///
+>          size(vsmall)) ///
+>     graphregion(color(white) margin(2 2 2 2)) ///
+>     plotregion(margin(2 2 2 2))
+
+. 
+. graph export "Figure_1/Figures/Figure_add_level1991_q4
+> _no_AKHI.png", replace width(5000)
+file /Users/miranaaazzz/Desktop/Replication_UI as a
+    Housing Market
+    Stabilizer/Figure_1/Figures/Figure_add_level1991_q
+    > 4_no_AKHI.png saved as PNG format
+
+. graph export "Figure_1/Figures/Figure_add_level1991_q4
+> _no_AKHI.pdf", replace
+file /Users/miranaaazzz/Desktop/Replication_UI as a
+    Housing Market
+    Stabilizer/Figure_1/Figures/Figure_add_level1991_q
+    > 4_no_AKHI.pdf saved as PDF format
+
+. 
+. 
+. 
+. * C) Additional Figure: LEVELS in 2010 (quartiles)
+. 
+. * WITH AK/HI
+. spmap q_10 using "shapefiles_dta/us_state_coor.dta", /
+> //
+>     id(id) ///
+>     clmethod(custom) clbreaks(0.5 1.5 2.5 3.5 4.5) ///
+>     fcolor(`q4colors') ///
+>     ocolor(black) osize(vthin) ///
+>     legend( ///
+>         pos(4) ring(0) ///
+>         region(lstyle(solid) lcolor(black) fcolor(whit
+> e)) ///
+>         symxsize(*2.6) symysize(*2.6) ///
+>         size(*1.2) ///
+>         order(1 2 3 4) ///
+>         label(1 "1") label(2 "2") label(3 "3") label(4
+>  "4") ///
+>     ) ///
+>     title("") ///
+>     note("Additional Figure. Geographic distribution o
+> f regular state unemployment insurance benefit levels 
+> in 2010, by quartile.", ///
+>          size(vsmall)) ///
+>     graphregion(color(white) margin(2 2 2 2)) ///
+>     plotregion(margin(2 2 2 2))
+
+. 
+. graph export "Figure_1/Figures/Figure_add_level2010_q4
+> _with_AKHI.png", replace width(5000)
+file /Users/miranaaazzz/Desktop/Replication_UI as a
+    Housing Market
+    Stabilizer/Figure_1/Figures/Figure_add_level2010_q
+    > 4_with_AKHI.png saved as PNG format
+
+. graph export "Figure_1/Figures/Figure_add_level2010_q4
+> _with_AKHI.pdf", replace
+file /Users/miranaaazzz/Desktop/Replication_UI as a
+    Housing Market
+    Stabilizer/Figure_1/Figures/Figure_add_level2010_q
+    > 4_with_AKHI.pdf saved as PDF format
+
+. 
+. * NO AK/HI
+. spmap q_10 if !inlist(STATEFP,"02","15") using "shapef
+> iles_dta/us_state_coor.dta", ///
+>     id(id) ///
+>     clmethod(custom) clbreaks(0.5 1.5 2.5 3.5 4.5) ///
+>     fcolor(`q4colors') ///
+>     ocolor(black) osize(vthin) ///
+>     legend( ///
+>         pos(4) ring(0) ///
+>         region(lstyle(solid) lcolor(black) fcolor(whit
+> e)) ///
+>         symxsize(*2.6) symysize(*2.6) ///
+>         size(*1.2) ///
+>         order(1 2 3 4) ///
+>         label(1 "1") label(2 "2") label(3 "3") label(4
+>  "4") ///
+>     ) ///
+>     title("") ///
+>     note("Additional Figure. Geographic distribution o
+> f regular state unemployment insurance benefit levels 
+> in 2010, by quartile.", ///
+>          size(vsmall)) ///
+>     graphregion(color(white) margin(2 2 2 2)) ///
+>     plotregion(margin(2 2 2 2))
+
+. 
+. graph export "Figure_1/Figures/Figure_add_level2010_q4
+> _no_AKHI.png", replace width(5000)
+file /Users/miranaaazzz/Desktop/Replication_UI as a
+    Housing Market
+    Stabilizer/Figure_1/Figures/Figure_add_level2010_q
+    > 4_no_AKHI.png saved as PNG format
+
+. graph export "Figure_1/Figures/Figure_add_level2010_q4
+> _no_AKHI.pdf", replace
+file /Users/miranaaazzz/Desktop/Replication_UI as a
+    Housing Market
+    Stabilizer/Figure_1/Figures/Figure_add_level2010_q
+    > 4_no_AKHI.pdf saved as PDF format
+
+. 
+. 
+.         
+. ******************************************************
+> *
+. * EXTRA: Convergence + Homogeneity checks (State-level
+> )
+. * Uses the same constructed variables:
+. *   max_ben_1991, max_ben_2010, d_max_ben
+. ******************************************************
+> *
+. 
+. 
+. * Correlation: initial level vs increase
+. di "==================================================
+> "
+==================================================
+
+. di "Correlation between initial level (1991) and incre
+> ase (2010-1991)"
+Correlation between initial level (1991) and increase (2
+> 010-1991)
+
+. di "==================================================
+> "
+==================================================
+
+. corr max_ben_1991 d_max_ben
+(obs=51)
+
+             | max~1991 d_max_~n
+-------------+------------------
+max_ben_1991 |   1.0000
+   d_max_ben |   0.5971   1.0000
+
+
+. 
+. 
+. matrix C = r(C)
+
+. scalar corr_91_inc = C[1,2]
+
+. di "corr(max_ben_1991, d_max_ben) = " %6.3f corr_91_in
+> c
+corr(max_ben_1991, d_max_ben) =  0.597
+
+. 
+. 
+. * Beta-convergence regression
+. * d_max_ben = a + b * max_ben_1991 + e
+. * b < 0 => convergence; b > 0 => divergence/persistenc
+> e
+. di "==================================================
+> "
+==================================================
+
+. di "Beta-convergence regression: d_max_ben on max_ben_
+> 1991"
+Beta-convergence regression: d_max_ben on max_ben_1991
+
+. di "==================================================
+> "
+==================================================
+
+. reg d_max_ben max_ben_1991, vce(robust)
+
+Linear regression                               Number o
+> f obs     =         51
+                                                F(1, 49)
+>           =      12.50
+                                                Prob > F
+>           =     0.0009
+                                                R-square
+> d         =     0.3566
+                                                Root MSE
+>           =     1.9651
+
+--------------------------------------------------------
+> ----------------------
+             |               Robust
+   d_max_ben | Coefficient  std. err.      t    P>|t|   
+>   [95% con                                            
+>           f. interval]
+-------------+------------------------------------------
+> ----------------------
+max_ben_1991 |   .9019854   .2551508     3.54   0.001   
+>   .3892407                                            
+>                1.41473
+       _cons |    .084279   1.459709     0.06   0.954   
+>  -2.849115                                            
+>               3.017674
+--------------------------------------------------------
+> ----------------------
+
+. 
+. 
+. * Scatter + fitted line (publication-style)
+. twoway ///
+>     (scatter d_max_ben max_ben_1991, ///
+>         msize(small) ///
+>         msymbol(O) ///
+>     ) ///
+>     (lfit d_max_ben max_ben_1991, ///
+>         lwidth(medthick) ///
+>     ), ///
+>     title("Correlation between Initial Level and Incre
+> ase") ///
+>     ytitle("Increase in Max Benefit (1991--2010)") ///
+>     xtitle("Max Benefit Level in 1991") ///
+>     legend(order(1 "Increase (2010-1991)" 2 "Fitted va
+> lues") pos(3) ring(0)) ///
+>     graphregion(color(white)) ///
+>     plotregion(margin(2 2 2 2))
+
+. 
+. graph export "Figure_1/Figures/convergence_scatter.png
+> ", replace width(2500)
+file /Users/miranaaazzz/Desktop/Replication_UI as a
+    Housing Market
+    Stabilizer/Figure_1/Figures/convergence_scatter.pn
+    > g saved as PNG format
+
+. graph export "Figure_1/Figures/convergence_scatter.pdf
+> ", replace
+file /Users/miranaaazzz/Desktop/Replication_UI as a
+    Housing Market
+    Stabilizer/Figure_1/Figures/convergence_scatter.pd
+    > f saved as PDF format
+
+. 
+. 
+. * Homogeneity check: dispersion in 1991 vs 2010
+. * Compare SD/Var/CV/Range
+. di "==================================================
+> "
+==================================================
+
+. di "Homogeneity check: dispersion in 1991 vs 2010"
+Homogeneity check: dispersion in 1991 vs 2010
+
+. di "==================================================
+> "
+==================================================
+
+. 
+. tabstat max_ben_1991 max_ben_2010, stat(n mean sd var 
+> min p10 p50 p90 max) col(stat)
+
+    Variable |         N      Mean        SD  Variance
+-------------+----------------------------------------
+max_ben_1991 |        51  5.917529  1.605573  2.577864
+max_ben_2010 |        51  11.33933  3.620773     13.11
+------------------------------------------------------
+
+    Variable |       Min       p10       p50       p90
+-------------+----------------------------------------
+max_ben_1991 |      3.64      4.29     5.746     7.618
+max_ben_2010 |      6.11      7.15    11.102    14.872
+------------------------------------------------------
+
+    Variable |       Max
+-------------+----------
+max_ben_1991 |     12.69
+max_ben_2010 |     28.29
+------------------------
+
+. 
+. * Coefficient of variation (CV = sd / mean)
+. quietly summarize max_ben_1991
+
+. local mean91 = r(mean)
+
+. local sd91   = r(sd)
+
+. quietly summarize max_ben_2010
+
+. local mean10 = r(mean)
+
+. local sd10   = r(sd)
+
+. 
+. di "CV(1991) = SD/Mean = " %6.3f (`sd91'/`mean91')
+CV(1991) = SD/Mean =  0.271
+
+. di "CV(2010) = SD/Mean = " %6.3f (`sd10'/`mean10')
+CV(2010) = SD/Mean =  0.319
+
+. 
+. 
+. * Overlay histograms (1991 vs 2010)
+. summ max_ben_1991
+
+    Variable |        Obs        Mean    Std. dev.      
+>  Min        Max
+-------------+------------------------------------------
+> ---------------
+max_ben_1991 |         51    5.917529    1.605573       
+> 3.64      12.69
+
+. local m91 = r(mean)
+
+. 
+. summ max_ben_2010
+
+    Variable |        Obs        Mean    Std. dev.      
+>  Min        Max
+-------------+------------------------------------------
+> ---------------
+max_ben_2010 |         51    11.33933    3.620773       
+> 6.11      28.29
+
+. local m10 = r(mean)
+
+. 
+. twoway ///
+>     (histogram max_ben_1991, percent width(0.5) lcolor
+> (black) fcolor(none) lwidth(medthick)) ///
+>     (histogram max_ben_2010, percent width(0.5) lcolor
+> (black) fcolor(none) lpattern(dash) lwidth(medthick)),
+>  ///
+>     xline(`m91', lpattern(solid)) ///
+>     xline(`m10', lpattern(dash)) ///
+>     title("Distribution of Maximum UI Benefits: 1991 v
+> s 2010") ///
+>     xtitle("Maximum UI Benefit Level") ///
+>     ytitle("Percent of States") ///
+>     legend(order(1 "1991 (solid)" 2 "2010 (dashed)") p
+> os(3) ring(0)) ///
+>     graphregion(color(white))
+
+. 
+. graph export "Figure_1/Figures/homogeneity_hist.png", 
+> replace width(2500)
+file /Users/miranaaazzz/Desktop/Replication_UI as a
+    Housing Market
+    Stabilizer/Figure_1/Figures/homogeneity_hist.png
+    saved as PNG format
+
+. graph export "Figure_1/Figures/homogeneity_hist.pdf", 
+> replace
+file /Users/miranaaazzz/Desktop/Replication_UI as a
+    Housing Market
+    Stabilizer/Figure_1/Figures/homogeneity_hist.pdf
+    saved as PDF format
+
+.         
+. 
+. 
+. 
+. 
+end of do-file
+
+. 
+. do "Figure_1/Figure_1_Same.do"
+
+. ******************************************************
+> *
+. * UI as a Housing Market Stabilizer (Hsu, Matsa, Melze
+> r)
+. * Figure 1 replication (PUBLIC data version)
+. *
+. * Figure 1: Geographic distribution of regular state U
+> I
+. * benefit increases between 1991 and 2010, by quantile
+> .
+. *
+. * Inputs:
+. *   1) ui_econ_analysis.dta  (state-year panel)
+. *   2) Census state shapefile: cb_2018_us_state_20m.sh
+> p
+. *
+. * Key points:
+. *   - Figure 1 does NOT require hpi_growth.
+. *   - d_max_ben = max_ben(2010) - max_ben(1991)
+. *   - Custom bins with exact counts (TOTAL=51):
+. *       1: 9  | 2: 12 | 3: 6 | 4: 9 | 5: 15
+. *   - DO NOT drop AK/HI from dataset before merge.
+. *     Exclude only at plotting stage for "no AK/HI" ma
+> p.
+. ******************************************************
+> *
+. 
+. version 16.0
+
+. clear all
+
+. set more off
+
+. 
+. 
+. cd "/Users/miranaaazzz/Desktop/Replication_UI as a Hou
+> sing Market Stabilizer"
+/Users/miranaaazzz/Desktop/Replication_UI as a Housing M
+> arket Stabilizer
+
+. 
+. capture mkdir "Figures"
+
+. capture mkdir "shapefiles_dta"
+
+. 
+. * Packages
+. cap which shp2dta
+
+. if _rc ssc install shp2dta, replace
+
+. 
+. cap which spmap
+
+. if _rc ssc install spmap, replace
+
+. 
+. 
+. * Shapefile -> Stata map files (safe to re-run)
+. shp2dta using "shapefiles/cb_2018_us_state_20m.shp", /
+> //
+>     database("shapefiles_dta/us_state_db") ///
+>     coordinates("shapefiles_dta/us_state_coor") ///
+>     genid(id) replace
+type: 5
+
+. 
+. 
+. * Compute benefit change 1991 -> 2010
+. use "ui_econ_analysis.dta", clear
+
+. keep if inlist(year, 1991, 2010)
+(918 observations deleted)
+
+. keep stcode year max_ben
+
+. 
+. reshape wide max_ben, i(stcode) j(year)
+(j = 1991 2010)
+
+Data                               Long   ->   Wide
+--------------------------------------------------------
+> ---------------------
+Number of observations              102   ->   51       
+>    
+Number of variables                   3   ->   3        
+>    
+j variable (2 values)              year   ->   (dropped)
+xij variables:
+                                max_ben   ->   max_ben19
+> 91 max_ben2010
+--------------------------------------------------------
+> ---------------------
+
+. 
+. gen d_max_ben = max_ben2010 - max_ben1991
+
+. label var d_max_ben "Change in maximum UI benefits, 19
+> 91-2010"
+
+. 
+. * Merge key: 2-digit state FIPS as string
+. gen STATEFP = string(stcode, "%02.0f")
+
+. 
+. 
+. * Merge with shapefile database (for id + names)
+. merge 1:1 STATEFP using "shapefiles_dta/us_state_db.dt
+> a"
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             1
+        from master                         0  (_merge==
+> 1)
+        from using                          1  (_merge==
+> 2)
+
+    Matched                                51  (_merge==
+> 3)
+    -----------------------------------------
+
+. keep if _merge==3
+(1 observation deleted)
+
+. drop _merge
+
+. 
+. 
+. * Custom bins with exact counts (requires TOTAL=51)
+. *    1:9, 2:12, 3:6, 4:9, 5:15  (sum=51)
+. count
+  51
+
+. di as txt "Merged sample size = " r(N)
+Merged sample size = 51
+
+. 
+. assert r(N)==51
+
+. 
+. * Hard sort to avoid ties/averaged ranks messing up ex
+> act counts
+. sort d_max_ben STATEFP
+
+. gen r = _n
+
+. label var r "Rank of d_max_ben (ascending)"
+
+. 
+. gen q5 = .
+(51 missing values generated)
+
+. replace q5 = 1 if r <= 9
+(9 real changes made)
+
+. replace q5 = 2 if inrange(r, 10, 21)     // 9 + 12 = 2
+> 1
+(12 real changes made)
+
+. replace q5 = 3 if inrange(r, 22, 27)     // +6 = 27
+(6 real changes made)
+
+. replace q5 = 4 if inrange(r, 28, 36)     // +9 = 36
+(9 real changes made)
+
+. replace q5 = 5 if inrange(r, 37, 51)     // remaining 
+> 15
+(15 real changes made)
+
+. 
+. label define q5lbl 1 "1" 2 "2" 3 "3" 4 "4" 5 "5", repl
+> ace
+
+. label values q5 q5lbl
+
+. label var q5 "Custom quantile groups (9/12/6/9/15)"
+
+. 
+. * Sanity check exact counts
+. tab q5, missing
+
+     Custom |
+   quantile |
+     groups |
+(9/12/6/9/1 |
+         5) |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          1 |          9       17.65       17.65
+          2 |         12       23.53       41.18
+          3 |          6       11.76       52.94
+          4 |          9       17.65       70.59
+          5 |         15       29.41      100.00
+------------+-----------------------------------
+      Total |         51      100.00
+
+. 
+. 
+. * Export a ranking table (helps diagnose "some states 
+> differ")
+. preserve
+
+.     keep STATEFP STUSPS NAME d_max_ben r q5
+
+.     sort d_max_ben
+
+.     export delimited using "Figure_1/Figure_1_state_ra
+> nking_customcounts.csv", replace
+file Figure_1/Figure_1_state_ranking_customcounts.csv sa
+> ved
+
+. restore
+
+. 
+. 
+. * Draw maps
+. * IMPORTANT: lock classes to integer codes so legend n
+> ever shifts
+. * clbreaks: (0.5,1.5,2.5,3.5,4.5,5.5)
+. *
+. * Grayscale like paper:
+. *     1 -> white (gs15)
+. *     2 -> very light gray (gs12)
+. *     3 -> medium gray (gs9)
+. *     4 -> darker gray (gs6)
+. *     5 -> darkest (gs3)
+. 
+. 
+. * Version A: WITH AK/HI
+. spmap q5 using "shapefiles_dta/us_state_coor.dta", ///
+>     id(id) ///
+>     clmethod(custom) clbreaks(0.5 1.5 2.5 3.5 4.5 5.5)
+>  ///
+>     fcolor(gs15 gs12 gs9 gs6 gs3) ///
+>     ocolor(black) osize(vthin) ///
+>     legend( ///
+>         pos(4) ring(0) ///
+>         region(lstyle(solid) lcolor(black) fcolor(whit
+> e)) ///
+>         symxsize(*2.6) symysize(*2.6) ///
+>         size(*1.2) ///
+>         order(1 2 3 4 5) ///
+>         label(1 "1") label(2 "2") label(3 "3") label(4
+>  "4") label(5 "5") ///
+>     ) ///
+>     title("") ///
+>     note("Figure 1. Geographic distribution of regular
+>  state unemployment insurance benefit increases betwee
+> n 1991 and 2010, by quantile.", ///
+>          size(vsmall)) ///
+>     graphregion(color(white) margin(2 2 2 2)) ///
+>     plotregion(margin(2 2 2 2))
+
+. 
+. graph export "Figure_1/Figures/Figure1_same_with_AKHI.
+> png", replace width(5000)
+file /Users/miranaaazzz/Desktop/Replication_UI as a
+    Housing Market
+    Stabilizer/Figure_1/Figures/Figure1_same_with_AKHI
+    > .png saved as PNG format
+
+. graph export "Figure_1/Figures/Figure1_same_with_AKHI.
+> pdf", replace
+file /Users/miranaaazzz/Desktop/Replication_UI as a
+    Housing Market
+    Stabilizer/Figure_1/Figures/Figure1_same_with_AKHI
+    > .pdf saved as PDF format
+
+. 
+. 
+. * Version B: NO AK/HI (exclude only at plotting stage)
+. spmap q5 if !inlist(STATEFP,"02","15") using "shapefil
+> es_dta/us_state_coor.dta", ///
+>     id(id) ///
+>     clmethod(custom) clbreaks(0.5 1.5 2.5 3.5 4.5 5.5)
+>  ///
+>     fcolor(gs15 gs12 gs9 gs6 gs3) ///
+>     ocolor(black) osize(vthin) ///
+>     legend( ///
+>         pos(4) ring(0) ///
+>         region(lstyle(solid) lcolor(black) fcolor(whit
+> e)) ///
+>         symxsize(*2.6) symysize(*2.6) ///
+>         size(*1.2) ///
+>         order(1 2 3 4 5) ///
+>         label(1 "1") label(2 "2") label(3 "3") label(4
+>  "4") label(5 "5") ///
+>     ) ///
+>     title("") ///
+>     note("Figure 1. Geographic distribution of regular
+>  state unemployment insurance benefit increases betwee
+> n 1991 and 2010, by quantile.", ///
+>          size(vsmall)) ///
+>     graphregion(color(white) margin(2 2 2 2)) ///
+>     plotregion(margin(2 2 2 2))
+
+. 
+. graph export "Figure_1/Figures/Figure1_same_no_AKHI.pn
+> g", replace width(5000)
+file /Users/miranaaazzz/Desktop/Replication_UI as a
+    Housing Market
+    Stabilizer/Figure_1/Figures/Figure1_same_no_AKHI.p
+    > ng saved as PNG format
+
+. graph export "Figure_1/Figures/Figure1_same_no_AKHI.pd
+> f", replace
+file /Users/miranaaazzz/Desktop/Replication_UI as a
+    Housing Market
+    Stabilizer/Figure_1/Figures/Figure1_same_no_AKHI.p
+    > df saved as PDF format
+
+. 
+.         
+.         
+.         
+.         
+. 
+end of do-file
+
+. 
+. * Table 3
+. do "Table_3/Table_3_Replication.do"
+
+. ******************************************************
+> ***
+. * UI as a Housing Market Stabilizer (Hsu, Matsa, Melze
+> r)
+. * Replicate Table 3
+. * Originally from ui_econ_analysis.do
+. ******************************************************
+> ***
+. 
+. // #delimit ;
+. 
+. capture do profile.do
+
+. cap log close

@@ -1,0 +1,52 @@
+d_max_ben,STATEFP,STUSPS,NAME,r,q5
+1.3000002,12,FL,Florida,1,1
+1.7159996,11,DC,District of Columbia,2,1
+1.7160001,22,LA,Louisiana,3,1
+1.9499998,04,AZ,Arizona,4,1
+2.2359996,26,MI,Michigan,5,1
+2.3400002,28,MS,Mississippi,6,1
+2.73,10,DE,Delaware,7,1
+2.8600001,47,TN,Tennessee,8,1
+2.9899998,01,AL,Alabama,9,1
+3.3280001,16,ID,Idaho,10,2
+3.5879998,55,WI,Wisconsin,11,2
+3.7699995,36,NY,New York,12,2
+3.77,13,GA,Georgia,13,2
+3.8999996,29,MO,Missouri,14,2
+3.9259996,45,SC,South Carolina,15,2
+4.1079998,02,AK,Alaska,16,2
+4.3940001,46,SD,South Dakota,17,2
+4.4979997,31,NE,Nebraska,18,2
+4.4980001,54,WV,West Virginia,19,2
+4.6800003,51,VA,Virginia,20,2
+4.7319999,48,TX,Texas,21,2
+5.0699997,24,MD,Maryland,22,3
+5.1479998,32,NV,Nevada,23,3
+5.5640006,20,KS,Kansas,24,3
+5.6160002,21,KY,Kentucky,25,3
+5.6420002,39,OH,Ohio,26,3
+5.7459998,05,AR,Arkansas,27,3
+5.9540005,18,IN,Indiana,28,4
+5.98,49,UT,Utah,29,4
+6.006,19,IA,Iowa,30,4
+6.0580001,40,OK,Oklahoma,31,4
+6.0580006,38,ND,North Dakota,32,4
+6.1879997,56,WY,Wyoming,33,4
+6.2399998,06,CA,California,34,4
+6.3180003,50,VT,Vermont,35,4
+6.3959999,41,OR,Oregon,36,4
+6.552,23,ME,Maine,37,5
+6.7079997,08,CO,Colorado,38,5
+6.7340002,33,NH,New Hampshire,39,5
+6.7600002,37,NC,North Carolina,40,5
+6.7859998,17,IL,Illinois,41,5
+6.7979999,30,MT,Montana,42,5
+6.8800006,53,WA,Washington,43,5
+7.0979996,42,PA,Pennsylvania,44,5
+7.3840003,15,HI,Hawaii,45,5
+7.592,09,CT,Connecticut,46,5
+8.0340004,34,NJ,New Jersey,47,5
+8.4499998,27,MN,Minnesota,48,5
+9.0480003,44,RI,Rhode Island,49,5
+9.0739994,35,NM,New Mexico,50,5
+15.600001,25,MA,Massachusetts,51,5

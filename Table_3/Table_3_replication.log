@@ -1,0 +1,852 @@
+--------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/miranaaazzz/Desktop/Replication_UI a
+> s a Housing Market Stabilizer/Table_3/Table_3_replicat
+> ion.log
+  log type:  text
+ opened on:  13 Feb 2026, 17:37:38
+
+. 
+. /*****************************************************
+> ***
+> ******************************************************
+> ***
+> ******************************************************
+> ***
+> 
+>         Unemployment Insurance as a Housing Market Sta
+> bilizer
+> 
+>         FILENAME: UI_econ_analysis.do
+> 
+>         Analyses of economic determinants of UI genero
+> sity
+>         and impact of UI generosity on benefit payment
+> s.
+>         
+>         1991 - 2010
+>         
+>         Results presented in Tables 1, 2 and 3 of the 
+> paper.
+>         
+>         VARIABLES
+>         
+>         stcode: state FIPS code
+>         year: year
+>         wba_max_thousands: maximum weekly UI benefit (
+> $ thousands)
+>         duration_max: maximum number of weeks for whic
+> h regular UI benefits are paid 
+>         eb_euc_weeks: maximum number of weeks for whic
+> h EB and EUC benefits are paid 
+>         max_ben: wba_max_thousands * duration_max
+>         max_ben_real: max_ben deflated to 2011 dollars
+>         max_ben_wages: max_ben / (wages_state / 2)  (f
+> raction of average semi-annual wages)
+>         ln_max_ben: ln(max_ben)
+>         max_ben_eb_euc: wba_max_thousands * eb_euc_wee
+> ks
+>         unemp_rate: unemployment rate
+>         ln_realgdp_percap: log of real GDP per capita
+>         wages_state: average wages
+>         cov: union coverage rate
+>         ui_rr: UI trust fund reserve ratio
+>         neg_ui_rr_pct: indicator for a negative UI tru
+> st fund balance * 100
+>         log_ui_benefits_reg: aggregate regular UI bene
+> fit payments 
+>         log_inc_maint: aggregate non-UI transfer payme
+> nts 
+>         log_pub_med: aggregate state health insurance 
+> payments
+>                 
+> ******************************************************
+> ***
+> ******************************************************
+> ***
+> ******************************************************
+> **/
+. 
+. use "ui_econ_analysis.dta", clear
+
+. 
+. *** NOTE: We have dropped non-public information on ho
+> me price growth used
+. *** in our analysis. Specifically, we exclude the vari
+> able "hpi_growth,"
+. *** referenced below, which measures the year-over-yea
+> r growth rate of
+. *** the Case-Shiller state-level home price index. Our
+>  data contract prevents
+. *** us from publishing the values of the index and the
+>  home price growth. Users
+. *** who obtain the state-level Case-Shiller Indexes fr
+> om CoreLogic
+. *** (http://www.corelogic.com/products/corelogic-case-
+> shiller.aspx)
+. *** can merge those data (by state and year) with ui_e
+> con_analysis.dta and
+. *** run the code below. 
+. 
+. 
+. 
+. // Table 3 - Regressions of UI generosity on economic 
+> variables with state and year fixed effects(delete hpi
+> _growth)
+. 
+. areg max_ben unemp_rate year_dum*, a(stcode) cl(stcode
+> )
+note: year_dum21 omitted because of collinearity.
+note: year_dum22 omitted because of collinearity.
+
+Linear regression, absorbing indicators             Numb
+> er of obs                                             
+>               =  1,020
+Absorbed variable: stcode                           No. 
+> of categories                                         
+>               =     51
+                                                    F(20
+> , 50)                                                 
+>               =  31.04
+                                                    Prob
+>  > F                                                  
+>               = 0.0000
+                                                    R-sq
+> uared                                                 
+>               = 0.9213
+                                                    Adj 
+> R-squared                                             
+>               = 0.9155
+                                                    Root
+>  MSE                                                  
+>               = 0.8952
+
+                                (Std. err. adjusted for 
+> 51 clusters in stcode)
+--------------------------------------------------------
+> ----------------------
+             |               Robust
+     max_ben | Coefficient  std. err.      t    P>|t|   
+>   [95% con                                            
+>           f. interval]
+-------------+------------------------------------------
+> ----------------------
+  unemp_rate |  -.0405587   .0783228    -0.52   0.607   
+>  -.1978746                                            
+>               .1167572
+   year_dum2 |  -5.517316   .4427665   -12.46   0.000   
+>  -6.406638                                            
+>              -4.627993
+   year_dum3 |  -5.215697   .4169652   -12.51   0.000   
+>  -6.053196                                            
+>              -4.378197
+   year_dum4 |  -5.014128   .4363109   -11.49   0.000   
+>  -5.890484                                            
+>              -4.137771
+   year_dum5 |  -4.786288   .4688567   -10.21   0.000   
+>  -5.728014                                            
+>              -3.844561
+   year_dum6 |  -4.665665   .4828193    -9.66   0.000   
+>  -5.635436                                            
+>              -3.695894
+   year_dum7 |  -4.456819   .4876301    -9.14   0.000   
+>  -5.436252                                            
+>              -3.477385
+   year_dum8 |  -4.262809   .5064843    -8.42   0.000   
+>  -5.280113                                            
+>              -3.245505
+   year_dum9 |  -4.055912   .5147011    -7.88   0.000   
+>   -5.08972                                            
+>              -3.022105
+  year_dum10 |  -3.767506   .5324489    -7.08   0.000   
+>  -4.836961                                            
+>              -2.698051
+  year_dum11 |  -3.320457   .5292132    -6.27   0.000   
+>  -4.383412                                            
+>              -2.257501
+  year_dum12 |  -2.964931   .4696105    -6.31   0.000   
+>  -3.908171                                            
+>               -2.02169
+  year_dum13 |  -2.521048   .3958809    -6.37   0.000   
+>  -3.316198                                            
+>              -1.725898
+  year_dum14 |  -2.225033   .3740986    -5.95   0.000   
+>  -2.976432                                            
+>              -1.473634
+  year_dum15 |  -2.022042   .3802482    -5.32   0.000   
+>  -2.785793                                            
+>              -1.258291
+  year_dum16 |  -1.832783   .3851019    -4.76   0.000   
+>  -2.606283                                            
+>              -1.059283
+  year_dum17 |  -1.561295     .42496    -3.67   0.001   
+>  -2.414852                                            
+>              -.7077374
+  year_dum18 |  -1.230364   .4011275    -3.07   0.003   
+>  -2.036052                                            
+>              -.4246753
+  year_dum19 |   -.755464   .2966092    -2.55   0.014   
+>  -1.351221                                            
+>              -.1597069
+  year_dum20 |  -.2104791   .0642263    -3.28   0.002   
+>  -.3394816                                            
+>              -.0814767
+  year_dum21 |          0  (omitted)
+  year_dum22 |          0  (omitted)
+       _cons |   11.69498    .786819    14.86   0.000   
+>    10.1146                                            
+>               13.27535
+--------------------------------------------------------
+> ----------------------
+
+. *outreg2 using t3_fe, excel alpha (0.01, 0.05, 0.10) b
+> dec(3) rdec(2) sdec(3) drop (year_dum*) replace
+. 
+. foreach var of var ln_realgdp_percap wages_state cov u
+> i_rr neg_ui_rr {
+  2. areg max_ben `var' year_dum*, a(stcode) cl(stcode)
+  3.   *outreg2 using t3_fe, excel alpha (0.01, 0.05, 0.
+> 10) bdec(3) rdec(2) sdec(3) drop (year_dum*) append
+. }
+note: year_dum21 omitted because of collinearity.
+note: year_dum22 omitted because of collinearity.
+
+Linear regression, absorbing indicators             Numb
+> er of obs                                             
+>               =  1,020
+Absorbed variable: stcode                           No. 
+> of categories                                         
+>               =     51
+                                                    F(20
+> , 50)                                                 
+>               =  29.17
+                                                    Prob
+>  > F                                                  
+>               = 0.0000
+                                                    R-sq
+> uared                                                 
+>               = 0.9221
+                                                    Adj 
+> R-squared                                             
+>               = 0.9164
+                                                    Root
+>  MSE                                                  
+>               = 0.8904
+
+                                (Std. err. adjusted for 
+> 51 clusters in stcode)
+--------------------------------------------------------
+> ----------------------
+             |               Robust
+     max_ben | Coefficient  std. err.      t    P>|t|   
+>   [95% con                                            
+>           f. interval]
+-------------+------------------------------------------
+> ----------------------
+ln_realgdp~p |   2.404738   1.881002     1.28   0.207   
+>  -1.373365                                            
+>               6.182842
+   year_dum2 |   -4.25597   .8849581    -4.81   0.000   
+>  -6.033461                                            
+>              -2.478479
+   year_dum3 |  -4.026566   .8316358    -4.84   0.000   
+>  -5.696955                                            
+>              -2.356176
+   year_dum4 |  -3.828668   .8129834    -4.71   0.000   
+>  -5.461594                                            
+>              -2.195743
+   year_dum5 |  -3.661898    .739087    -4.95   0.000   
+>  -5.146398                                            
+>              -2.177398
+   year_dum6 |  -3.576273   .7121099    -5.02   0.000   
+>  -5.006587                                            
+>              -2.145958
+   year_dum7 |  -3.435871   .6434656    -5.34   0.000   
+>   -4.72831                                            
+>              -2.143433
+   year_dum8 |  -3.306008   .5955178    -5.55   0.000   
+>  -4.502141                                            
+>              -2.109876
+   year_dum9 |  -3.573503   .3128526   -11.42   0.000   
+>  -4.201886                                            
+>               -2.94512
+  year_dum10 |  -3.348915   .2873125   -11.66   0.000   
+>  -3.925999                                            
+>              -2.771831
+  year_dum11 |  -2.954968   .2464569   -11.99   0.000   
+>  -3.449991                                            
+>              -2.459945
+  year_dum12 |  -2.641291   .2314663   -11.41   0.000   
+>  -3.106205                                            
+>              -2.176377
+  year_dum13 |   -2.25848   .2128178   -10.61   0.000   
+>  -2.685938                                            
+>              -1.831023
+  year_dum14 |  -2.012109   .2061341    -9.76   0.000   
+>  -2.426142                                            
+>              -1.598077
+  year_dum15 |  -1.848764   .1785196   -10.36   0.000   
+>  -2.207331                                            
+>              -1.490196
+  year_dum16 |  -1.685376   .1650359   -10.21   0.000   
+>   -2.01686                                            
+>              -1.353892
+  year_dum17 |  -1.430215   .1654314    -8.65   0.000   
+>  -1.762494                                            
+>              -1.097936
+  year_dum18 |  -1.116697   .1414057    -7.90   0.000   
+>  -1.400718                                            
+>              -.8326751
+  year_dum19 |  -.6567499   .1055993    -6.22   0.000   
+>  -.8688524                                            
+>              -.4446475
+  year_dum20 |  -.1465151     .07125    -2.06   0.045   
+>  -.2896249                                            
+>              -.0034052
+  year_dum21 |          0  (omitted)
+  year_dum22 |          0  (omitted)
+       _cons |  -14.22231   19.93663    -0.71   0.479   
+>  -54.26621                                            
+>               25.82159
+--------------------------------------------------------
+> ----------------------
+note: year_dum21 omitted because of collinearity.
+note: year_dum22 omitted because of collinearity.
+
+Linear regression, absorbing indicators             Numb
+> er of obs                                             
+>               =  1,020
+Absorbed variable: stcode                           No. 
+> of categories                                         
+>               =     51
+                                                    F(20
+> , 50)                                                 
+>               =  40.78
+                                                    Prob
+>  > F                                                  
+>               = 0.0000
+                                                    R-sq
+> uared                                                 
+>               = 0.9226
+                                                    Adj 
+> R-squared                                             
+>               = 0.9169
+                                                    Root
+>  MSE                                                  
+>               = 0.8879
+
+                                (Std. err. adjusted for 
+> 51 clusters in stcode)
+--------------------------------------------------------
+> ----------------------
+             |               Robust
+     max_ben | Coefficient  std. err.      t    P>|t|   
+>   [95% con                                            
+>           f. interval]
+-------------+------------------------------------------
+> ----------------------
+ wages_state |   .0621468   .1044624     0.59   0.555   
+>  -.1476721                                            
+>               .2719657
+   year_dum2 |  -3.815006   2.528583    -1.51   0.138   
+>  -8.893814                                            
+>               1.263803
+   year_dum3 |   -3.62258   2.366013    -1.53   0.132   
+>  -8.374857                                            
+>               1.129698
+   year_dum4 |  -3.440128   2.305591    -1.49   0.142   
+>  -8.071044                                            
+>               1.190789
+   year_dum5 |  -3.233198   2.231909    -1.45   0.154   
+>  -7.716119                                            
+>               1.249724
+   year_dum6 |  -3.146745   2.166038    -1.45   0.153   
+>  -7.497359                                            
+>                1.20387
+   year_dum7 |  -2.989388   2.061439    -1.45   0.153   
+>  -7.129911                                            
+>               1.151134
+   year_dum8 |  -2.851865   1.948621    -1.46   0.150   
+>  -6.765786                                            
+>               1.062055
+   year_dum9 |  -2.723547   1.825651    -1.49   0.142   
+>  -6.390475                                            
+>               .9433801
+  year_dum10 |  -2.510364   1.681896    -1.49   0.142   
+>  -5.888552                                            
+>                .867824
+  year_dum11 |  -2.166112   1.515538    -1.43   0.159   
+>  -5.210159                                            
+>               .8779346
+  year_dum12 |  -1.947114    1.34887    -1.44   0.155   
+>  -4.656399                                            
+>               .7621704
+  year_dum13 |  -1.607778   1.256488    -1.28   0.207   
+>  -4.131509                                            
+>               .9159534
+  year_dum14 |  -1.419828   1.097345    -1.29   0.202   
+>  -3.623911                                            
+>                .784254
+  year_dum15 |  -1.317887   .9002689    -1.46   0.149   
+>   -3.12613                                            
+>               .4903562
+  year_dum16 |    -1.2199    .738087    -1.65   0.105   
+>  -2.702391                                            
+>               .2625915
+  year_dum17 |  -1.043944   .5256849    -1.99   0.053   
+>  -2.099814                                            
+>               .0119247
+  year_dum18 |  -.8310634   .3519643    -2.36   0.022   
+>  -1.538005                                            
+>              -.1241223
+  year_dum19 |  -.4875509   .2124898    -2.29   0.026   
+>  -.9143492                                            
+>              -.0607527
+  year_dum20 |  -.1013902   .1696394    -0.60   0.553   
+>  -.4421211                                            
+>               .2393406
+  year_dum21 |          0  (omitted)
+  year_dum22 |          0  (omitted)
+       _cons |   8.096459   5.351195     1.51   0.137   
+>  -2.651733                                            
+>               18.84465
+--------------------------------------------------------
+> ----------------------
+note: year_dum21 omitted because of collinearity.
+note: year_dum22 omitted because of collinearity.
+
+Linear regression, absorbing indicators             Numb
+> er of obs                                             
+>               =  1,020
+Absorbed variable: stcode                           No. 
+> of categories                                         
+>               =     51
+                                                    F(20
+> , 50)                                                 
+>               =  32.54
+                                                    Prob
+>  > F                                                  
+>               = 0.0000
+                                                    R-sq
+> uared                                                 
+>               = 0.9212
+                                                    Adj 
+> R-squared                                             
+>               = 0.9154
+                                                    Root
+>  MSE                                                  
+>               = 0.8957
+
+                                (Std. err. adjusted for 
+> 51 clusters in stcode)
+--------------------------------------------------------
+> ----------------------
+             |               Robust
+     max_ben | Coefficient  std. err.      t    P>|t|   
+>   [95% con                                            
+>           f. interval]
+-------------+------------------------------------------
+> ----------------------
+         cov |   .0125479   .0604662     0.21   0.836   
+>   -.108902                                            
+>               .1339978
+   year_dum2 |  -5.480484    .506191   -10.83   0.000   
+>  -6.497198                                            
+>              -4.463769
+   year_dum3 |  -5.191813   .4798222   -10.82   0.000   
+>  -6.155564                                            
+>              -4.228062
+   year_dum4 |   -4.96435   .4597381   -10.80   0.000   
+>  -5.887761                                            
+>              -4.040939
+   year_dum5 |  -4.705316   .4431221   -10.62   0.000   
+>  -5.595353                                            
+>              -3.815279
+   year_dum6 |  -4.563152    .413451   -11.04   0.000   
+>  -5.393593                                            
+>              -3.732711
+   year_dum7 |  -4.344345   .3888701   -11.17   0.000   
+>  -5.125414                                            
+>              -3.563277
+   year_dum8 |  -4.126744   .3608351   -11.44   0.000   
+>  -4.851503                                            
+>              -3.401986
+   year_dum9 |  -3.902213   .3381272   -11.54   0.000   
+>  -4.581362                                            
+>              -3.223065
+  year_dum10 |  -3.604477    .341561   -10.55   0.000   
+>  -4.290522                                            
+>              -2.918431
+  year_dum11 |  -3.141535   .2894991   -10.85   0.000   
+>  -3.723011                                            
+>              -2.560059
+  year_dum12 |  -2.810148   .2663293   -10.55   0.000   
+>  -3.345086                                            
+>               -2.27521
+  year_dum13 |  -2.396648   .2338429   -10.25   0.000   
+>  -2.866335                                            
+>               -1.92696
+  year_dum14 |  -2.105753   .2191876    -9.61   0.000   
+>  -2.546004                                            
+>              -1.665502
+  year_dum15 |  -1.881341   .1871003   -10.06   0.000   
+>  -2.257143                                            
+>              -1.505539
+  year_dum16 |  -1.680605   .1732578    -9.70   0.000   
+>  -2.028603                                            
+>              -1.332606
+  year_dum17 |  -1.386024    .158152    -8.76   0.000   
+>  -1.703682                                            
+>              -1.068367
+  year_dum18 |  -1.052917   .1249866    -8.42   0.000   
+>   -1.30396                                            
+>               -.801874
+  year_dum19 |  -.6224254   .0899805    -6.92   0.000   
+>  -.8031565                                            
+>              -.4416942
+  year_dum20 |  -.2042033   .0617179    -3.31   0.002   
+>  -.3281674                                            
+>              -.0802392
+  year_dum21 |          0  (omitted)
+  year_dum22 |          0  (omitted)
+       _cons |   11.18477   .7245622    15.44   0.000   
+>   9.729447                                            
+>                12.6401
+--------------------------------------------------------
+> ----------------------
+note: year_dum21 omitted because of collinearity.
+note: year_dum22 omitted because of collinearity.
+
+Linear regression, absorbing indicators             Numb
+> er of obs                                             
+>               =  1,020
+Absorbed variable: stcode                           No. 
+> of categories                                         
+>               =     51
+                                                    F(20
+> , 50)                                                 
+>               =  30.91
+                                                    Prob
+>  > F                                                  
+>               = 0.0000
+                                                    R-sq
+> uared                                                 
+>               = 0.9212
+                                                    Adj 
+> R-squared                                             
+>               = 0.9154
+                                                    Root
+>  MSE                                                  
+>               = 0.8957
+
+                                (Std. err. adjusted for 
+> 51 clusters in stcode)
+--------------------------------------------------------
+> ----------------------
+             |               Robust
+     max_ben | Coefficient  std. err.      t    P>|t|   
+>   [95% con                                            
+>           f. interval]
+-------------+------------------------------------------
+> ----------------------
+       ui_rr |   .0215164   .1926921     0.11   0.912   
+>  -.3655172                                            
+>               .4085499
+   year_dum2 |  -5.467263   .6334662    -8.63   0.000   
+>  -6.739618                                            
+>              -4.194909
+   year_dum3 |  -5.177059   .5821733    -8.89   0.000   
+>  -6.346388                                            
+>               -4.00773
+   year_dum4 |  -4.947533   .5329935    -9.28   0.000   
+>  -6.018082                                            
+>              -3.876984
+   year_dum5 |  -4.692624   .5401286    -8.69   0.000   
+>  -5.777504                                            
+>              -3.607744
+   year_dum6 |  -4.558467   .5374637    -8.48   0.000   
+>  -5.637995                                            
+>               -3.47894
+   year_dum7 |  -4.346388   .5422888    -8.01   0.000   
+>  -5.435607                                            
+>              -3.257169
+   year_dum8 |  -4.135673   .5304803    -7.80   0.000   
+>  -5.201174                                            
+>              -3.070171
+   year_dum9 |  -3.914874   .5146369    -7.61   0.000   
+>  -4.948552                                            
+>              -2.881195
+  year_dum10 |  -3.616486   .5249517    -6.89   0.000   
+>  -4.670883                                            
+>               -2.56209
+  year_dum11 |  -3.159986   .4887608    -6.47   0.000   
+>   -4.14169                                            
+>              -2.178281
+  year_dum12 |  -2.829937    .461714    -6.13   0.000   
+>  -3.757317                                            
+>              -1.902557
+  year_dum13 |  -2.415898   .4105421    -5.88   0.000   
+>  -3.240496                                            
+>                -1.5913
+  year_dum14 |  -2.125589   .3846835    -5.53   0.000   
+>  -2.898249                                            
+>               -1.35293
+  year_dum15 |  -1.898756   .3135122    -6.06   0.000   
+>  -2.528464                                            
+>              -1.269048
+  year_dum16 |  -1.697013   .2822963    -6.01   0.000   
+>  -2.264022                                            
+>              -1.130004
+  year_dum17 |  -1.407483   .2989892    -4.71   0.000   
+>   -2.00802                                            
+>              -.8069451
+  year_dum18 |  -1.074825   .2727386    -3.94   0.000   
+>  -1.622636                                            
+>              -.5270131
+  year_dum19 |  -.6394755   .2477336    -2.58   0.013   
+>  -1.137063                                            
+>               -.141888
+  year_dum20 |  -.2183352   .1825854    -1.20   0.237   
+>  -.5850687                                            
+>               .1483984
+  year_dum21 |          0  (omitted)
+  year_dum22 |          0  (omitted)
+       _cons |   11.33548   .2010902    56.37   0.000   
+>   10.93157                                            
+>               11.73938
+--------------------------------------------------------
+> ----------------------
+note: year_dum21 omitted because of collinearity.
+note: year_dum22 omitted because of collinearity.
+
+Linear regression, absorbing indicators             Numb
+> er of obs                                             
+>               =  1,020
+Absorbed variable: stcode                           No. 
+> of categories                                         
+>               =     51
+                                                    F(20
+> , 50)                                                 
+>               =  31.11
+                                                    Prob
+>  > F                                                  
+>               = 0.0000
+                                                    R-sq
+> uared                                                 
+>               = 0.9221
+                                                    Adj 
+> R-squared                                             
+>               = 0.9163
+                                                    Root
+>  MSE                                                  
+>               = 0.8907
+
+                                (Std. err. adjusted for 
+> 51 clusters in stcode)
+--------------------------------------------------------
+> ----------------------
+             |               Robust
+     max_ben | Coefficient  std. err.      t    P>|t|   
+>   [95% con                                            
+>           f. interval]
+-------------+------------------------------------------
+> ----------------------
+neg_ui_rr_~t |  -.0052997   .0051237    -1.03   0.306   
+>  -.0155909                                            
+>               .0049916
+   year_dum2 |  -5.681591   .5369027   -10.58   0.000   
+>  -6.759992                                            
+>              -4.603191
+   year_dum3 |  -5.366691   .4994861   -10.74   0.000   
+>  -6.369939                                            
+>              -4.363444
+   year_dum4 |  -5.131986   .4827574   -10.63   0.000   
+>  -6.101633                                            
+>              -4.162339
+   year_dum5 |   -4.89622   .4834608   -10.13   0.000   
+>   -5.86728                                            
+>               -3.92516
+   year_dum6 |  -4.781827   .5000399    -9.56   0.000   
+>  -5.786186                                            
+>              -3.777467
+   year_dum7 |  -4.568925   .4970813    -9.19   0.000   
+>  -5.567342                                            
+>              -3.570507
+   year_dum8 |  -4.358532   .4872269    -8.95   0.000   
+>  -5.337157                                            
+>              -3.379908
+   year_dum9 |  -4.137003   .4653375    -8.89   0.000   
+>  -5.071661                                            
+>              -3.202345
+  year_dum10 |  -3.838258   .4697459    -8.17   0.000   
+>   -4.78177                                            
+>              -2.894746
+  year_dum11 |  -3.381984   .4351934    -7.77   0.000   
+>  -4.256095                                            
+>              -2.507872
+  year_dum12 |  -3.051827   .4042552    -7.55   0.000   
+>  -3.863797                                            
+>              -2.239856
+  year_dum13 |   -2.64214   .3782125    -6.99   0.000   
+>  -3.401802                                            
+>              -1.882478
+  year_dum14 |  -2.334965   .3653284    -6.39   0.000   
+>  -3.068749                                            
+>              -1.601181
+  year_dum15 |  -2.094888   .3341049    -6.27   0.000   
+>  -2.765957                                            
+>              -1.423819
+  year_dum16 |  -1.904887   .3309352    -5.76   0.000   
+>   -2.56959                                            
+>              -1.240184
+  year_dum17 |  -1.623749   .3396996    -4.78   0.000   
+>  -2.306056                                            
+>              -.9414427
+  year_dum18 |  -1.310023   .3100169    -4.23   0.000   
+>   -1.93271                                            
+>              -.6873353
+  year_dum19 |  -.8644155   .2695661    -3.21   0.002   
+>  -1.405855                                            
+>              -.3229761
+  year_dum20 |  -.4270835    .226827    -1.88   0.066   
+>   -.882679                                            
+>                .028512
+  year_dum21 |          0  (omitted)
+  year_dum22 |          0  (omitted)
+       _cons |   11.59912   .4045769    28.67   0.000   
+>    10.7865                                            
+>               12.41174
+--------------------------------------------------------
+> ----------------------
+
+. areg max_ben unemp_rate ln_realgdp_percap wages_state 
+> cov ui_rr neg_ui_rr year_dum*, a(stcode) cl(stcode)
+note: year_dum21 omitted because of collinearity.
+note: year_dum22 omitted because of collinearity.
+
+Linear regression, absorbing indicators             Numb
+> er of obs                                             
+>               =  1,020
+Absorbed variable: stcode                           No. 
+> of categories                                         
+>               =     51
+                                                    F(25
+> , 50)                                                 
+>               =  30.77
+                                                    Prob
+>  > F                                                  
+>               = 0.0000
+                                                    R-sq
+> uared                                                 
+>               = 0.9239
+                                                    Adj 
+> R-squared                                             
+>               = 0.9178
+                                                    Root
+>  MSE                                                  
+>               = 0.8828
+
+                                (Std. err. adjusted for 
+> 51 clusters in stcode)
+--------------------------------------------------------
+> ----------------------
+             |               Robust
+     max_ben | Coefficient  std. err.      t    P>|t|   
+>   [95% con                                            
+>           f. interval]
+-------------+------------------------------------------
+> ----------------------
+  unemp_rate |   .0132545   .0689994     0.19   0.848   
+>  -.1253349                                            
+>               .1518439
+ln_realgdp~p |   1.776415   1.551051     1.15   0.258   
+>  -1.338963                                            
+>               4.891794
+ wages_state |   .0546911   .0985745     0.55   0.581   
+>  -.1433016                                            
+>               .2526838
+         cov |   .0100765    .058397     0.17   0.864   
+>  -.1072173                                            
+>               .1273703
+       ui_rr |  -.0939177   .1638546    -0.57   0.569   
+>  -.4230293                                            
+>               .2351938
+neg_ui_rr_~t |   -.004933   .0041255    -1.20   0.237   
+>  -.0132194                                            
+>               .0033533
+   year_dum2 |   -3.20585   2.494896    -1.28   0.205   
+>  -8.216996                                            
+>               1.805296
+   year_dum3 |  -3.043737   2.337733    -1.30   0.199   
+>  -7.739213                                            
+>               1.651738
+   year_dum4 |  -2.878895   2.288374    -1.26   0.214   
+>   -7.47523                                            
+>                1.71744
+   year_dum5 |   -2.73314   2.221922    -1.23   0.224   
+>  -7.196001                                            
+>               1.729721
+   year_dum6 |  -2.681974   2.145413    -1.25   0.217   
+>  -6.991163                                            
+>               1.627216
+   year_dum7 |  -2.561851   2.025107    -1.27   0.212   
+>  -6.629399                                            
+>               1.505696
+   year_dum8 |  -2.465344   1.914398    -1.29   0.204   
+>  -6.310526                                            
+>               1.379838
+   year_dum9 |  -2.676712   1.713101    -1.56   0.124   
+>  -6.117576                                            
+>               .7641524
+  year_dum10 |  -2.503914   1.583527    -1.58   0.120   
+>  -5.684521                                            
+>               .6766932
+  year_dum11 |  -2.184884   1.427562    -1.53   0.132   
+>  -5.052226                                            
+>               .6824584
+  year_dum12 |  -1.971553   1.261145    -1.56   0.124   
+>  -4.504636                                            
+>               .5615308
+  year_dum13 |  -1.670742   1.156485    -1.44   0.155   
+>  -3.993611                                            
+>               .6521261
+  year_dum14 |  -1.497827   1.013389    -1.48   0.146   
+>  -3.533278                                            
+>               .5376244
+  year_dum15 |  -1.427263   .8490031    -1.68   0.099   
+>  -3.132536                                            
+>               .2780097
+  year_dum16 |  -1.355979   .7115458    -1.91   0.062   
+>  -2.785161                                            
+>               .0732022
+  year_dum17 |  -1.184973   .5549354    -2.14   0.038   
+>  -2.299594                                            
+>              -.0703524
+  year_dum18 |   -.984225   .4376719    -2.25   0.029   
+>  -1.863315                                            
+>              -.1051351
+  year_dum19 |  -.6191142   .3232005    -1.92   0.061   
+>  -1.268281                                            
+>               .0300531
+  year_dum20 |  -.2014253   .2382572    -0.85   0.402   
+>  -.6799789                                            
+>               .2771283
+  year_dum21 |          0  (omitted)
+  year_dum22 |          0  (omitted)
+       _cons |  -10.37894   17.18934    -0.60   0.549   
+>  -44.90475                                            
+>               24.14687
+--------------------------------------------------------
+> ----------------------
+
+.   *outreg2 using t3_fe, excel alpha (0.01, 0.05, 0.10)
+>  bdec(3) rdec(2) sdec(3) drop (year_dum*) append
+. 
+. log close  
+      name:  <unnamed>
+       log:  /Users/miranaaazzz/Desktop/Replication_UI a
+> s a Housing Market Stabilizer/Table_3/Table_3_replicat
+> ion.log
+  log type:  text
+ closed on:  13 Feb 2026, 17:37:38
+--------------------------------------------------------
